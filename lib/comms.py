@@ -31,9 +31,9 @@ class StealthConn(object):
             shared_hash = calculate_dh_secret(their_public_key, my_private_key)
             print("Shared hash: {}".format(shared_hash))
 
-        # 
-        ctr=Counter.new(128, initial_value=int("f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff",16))
-        # Using CTR AES
+        # Uses first 4 bytes of shared hash (the only common number both ends have I could think of)
+        ctr=Counter.new(128, initial_value=int.from_bytes(shared_hash[:4], byteorder='big'))
+        # Using CTR AES to encrypt with incrimenting IV thats the same on both ends
         self.cipher = AES.new(shared_hash, AES.MODE_CTR, counter=ctr)
         # Create HMAC
         self.hmac = HMAC.new(shared_hash, digestmod=SHA256)
