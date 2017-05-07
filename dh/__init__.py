@@ -27,13 +27,13 @@ def create_dh_key():
     # Returns (public, private)
     private = random.randint(0, int(2**32))
     public = pow(generator, private, prime)
-    print('Keys are: '+str(private)+', '+str(public))
+    # print('Keys are: '+str(private)+', '+str(public))
     return (public, private)
 
 def calculate_dh_secret(their_public, my_private):
     # Calculate the shared secret
     shared_secret = pow(their_public, my_private, prime)
-    print("Out shared secret is:"+str(shared_secret))
+    # print("Out shared secret is:"+str(shared_secret))
     # Hash the value so that:
     # (a) There's no bias in the bits of the output
     #     (there may be bias if the shared secret is used raw)

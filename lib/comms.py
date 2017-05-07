@@ -29,7 +29,7 @@ class StealthConn(object):
             their_public_key = int(self.recv())
             # Obtain our shared secret
             shared_hash = calculate_dh_secret(their_public_key, my_private_key)
-            print("Shared hash: {}".format(shared_hash))
+            # print("Shared hash: {}".format(shared_hash))
 
         # Uses first 4 bytes of shared hash (the only common number both ends have I could think of)
         ctr=Counter.new(128, initial_value=int.from_bytes(shared_hash[:4], byteorder='big'))
