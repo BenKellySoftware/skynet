@@ -3,8 +3,6 @@ from Crypto.Random import random
 
 from lib.helpers import read_hex
 
-# Project TODO: Is this the best choice of prime? Why? Why not? Feel free to replace!
-
 # 1536 bit safe prime for Diffie-Hellman key exchange
 # obtained from RFC 3526
 raw_prime = """FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1
@@ -17,14 +15,9 @@ C2007CB8 A163BF05 98DA4836 1C55D39A 69163FA8 FD24CF5F
 670C354E 4ABC9804 F1746C08 CA237327 FFFFFFFF FFFFFFFF"""
 # Convert from the value supplied in the RFC to an integer
 prime = read_hex(raw_prime)
-# prime = 23
 generator = 2
 
-# Project TODO: write the appropriate code to perform DH key exchange
-
 def create_dh_key():
-    # Creates a Diffie-Hellman key
-    # Returns (public, private)
     private = random.randint(0, int(2**32))
     public = pow(generator, private, prime)
     # print('Keys are: '+str(private)+', '+str(public))
@@ -33,13 +26,7 @@ def create_dh_key():
 def calculate_dh_secret(their_public, my_private):
     # Calculate the shared secret
     shared_secret = pow(their_public, my_private, prime)
-    # print("Out shared secret is:"+str(shared_secret))
-    # Hash the value so that:
-    # (a) There's no bias in the bits of the output
-    #     (there may be bias if the shared secret is used raw)
-    # (b) We can convert to raw bytes easily
-    # (c) We could add additional information if we wanted
-    # Feel free to change SHA256 to a different value if more appropriate
+    
     # Use digest to output as 32 byte ascii hash (that uses all 256 values instead of the 16 hexdigest gives)
     shared_hash = SHA256.new(bytes(str(shared_secret), "ascii")).digest()
     return shared_hash

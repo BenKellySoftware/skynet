@@ -30,13 +30,15 @@ class StealthConn(object):
             # Obtain our shared secret
             shared_hash = calculate_dh_secret(their_public_key, my_private_key)
             # print("Shared hash: {}".format(shared_hash))
+        
         #Create Hmac
         self.hmac = HMAC.new(shared_hash, digestmod=SHA256)
+        
         # Uses first 4 bytes of shared hash (the only common number both ends have I could think of)
         self.ctr = Counter.new(128, initial_value=int.from_bytes(shared_hash[:4], byteorder='big'))
+        
         # Using CTR AES to encrypt with incrimenting IV thats the same on both ends
         self.cipher = AES.new(shared_hash, AES.MODE_CTR, counter=self.ctr)
-
 
     def send(self, data):
         if self.cipher:
@@ -80,32 +82,14 @@ class StealthConn(object):
 
         return data
 
+    # Confirms message wasn't tampered with by checking against HMAC
     def verify_hmac(self, encrypted_data, mac):
         return self.mac(encrypted_data) == mac
 
+    # Updates hmac with new data and digests
     def mac(self, encrypted_data):
         self.hmac.update(encrypted_data)
         return self.hmac.digest()
-    # def pad(self, m, pad_length=16):
-    #     # Work out how many bytes need to be added
-    #     required_padding = pad_length - (len(m) % pad_length)
-    #     # Use a bytearray so we can add to the end of m
-    #     b = bytearray(m)
-    #     # Then k-1 zero bytes, where k is the required padding
-    #     b.extend(bytes("\x00" * (required_padding-1), "ascii"))
-    #     # And finally adding the number of padding bytes added
-    #     b.append(required_padding)
-    #     return bytes(b)
-
-    # def unpad(self, m, pad_length=16):
-    #     # The last byte should represent the number of padding bytes added
-    #     required_padding = m[-1]
-    #     # Ensure that there are required_padding - 1 zero bytes
-    #     if m.count(bytes([0]), -required_padding, -1) == required_padding - 1:
-    #         return m[:-required_padding]
-    #     else:
-    #         # Raise an exception in the case of an invalid padding
-    #         raise AssertionError("Padding was invalid")
-
+    
     def close(self):
         self.conn.close()
