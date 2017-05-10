@@ -37,7 +37,7 @@ class StealthConn(object):
         # Uses first 4 bytes of shared hash (the only common number both ends have I could think of)
         self.ctr = Counter.new(128, initial_value=int.from_bytes(shared_hash[:4], byteorder='big'))
         
-        # Using CTR AES to encrypt with incrimenting IV thats the same on both ends
+        # Using CTR AES to encrypt with incrimenting counter thats the same on both ends
         self.cipher = AES.new(shared_hash, AES.MODE_CTR, counter=self.ctr)
 
     def send(self, data):
