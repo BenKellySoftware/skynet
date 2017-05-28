@@ -1,4 +1,5 @@
 import os
+import Crypto.PublicKey.RSA as RSA
 
 # Instead of storing files on disk,
 # we'll save them in memory for simplicity
@@ -34,11 +35,12 @@ def verify_file(f):
     # Verify the file was sent by the bot master
     # TODO: For Part 2, you'll use public key crypto here
     # Naive verification by ensuring the first line has the "passkey"
+    pubkey = RSA.importKey(open('id_rsa','r').read())
     lines = f.split(bytes("\n", "ascii"), 1)
     first_line = lines[0]
-    if first_line == bytes("Caesar", "ascii"):
-        return True
-    return False
+    print(int(first_line))
+    print(lines[1])
+    return pubkey.verify(lines[1],(int(first_line),""))
 
 def process_file(fn, f):
     if verify_file(f):

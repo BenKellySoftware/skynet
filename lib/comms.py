@@ -20,7 +20,6 @@ class StealthConn(object):
     def initiate_session(self):
         # Perform the initial connection handshake for agreeing on a shared secret 
 
-        # This can be broken into code run just on the server or just on the client
         if self.server or self.client:
             my_public_key, my_private_key = create_dh_key()
             # Send them our public key
@@ -34,8 +33,8 @@ class StealthConn(object):
         #Create Hmac
         self.hmac = HMAC.new(shared_hash, digestmod=SHA256)
         
-        # Uses first 4 bytes of shared hash (the only common number both ends have I could think of)
-        self.ctr = Counter.new(128, initial_value=int.from_bytes(shared_hash[:4], byteorder='big'))
+        # Uses first 4 bytes of shared hash
+        self.ctr = Counter.new(128, initial_value=int.from_bytes(shared_hash[4:], byteorder='big'))
         
         # Using CTR AES to encrypt with incrimenting IV thats the same on both ends
         self.cipher = AES.new(shared_hash, AES.MODE_CTR, counter=self.ctr)
@@ -72,7 +71,8 @@ class StealthConn(object):
             if self.verify_hmac(encrypted_data, mac):
                 data = self.cipher.decrypt(encrypted_data)
             else:
-                data = "Invalid HMAC, message might've been tampered with"
+                # print("Invalid HMAC, message might've been tampered with")
+                data = bytes("Invalid HMAC, message might've been tampered with", "ascii")
             if self.verbose:
                 print("Receiving packet of length {}".format(pkt_len))
                 print("Encrypted data: {}".format(repr(encrypted_data)))

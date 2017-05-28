@@ -13,6 +13,7 @@ EE386BFB 5A899FA5 AE9F2411 7C4B1FE6 49286651 ECE45B3D
 C2007CB8 A163BF05 98DA4836 1C55D39A 69163FA8 FD24CF5F
 83655D23 DCA3AD96 1C62F356 208552BB 9ED52907 7096966D
 670C354E 4ABC9804 F1746C08 CA237327 FFFFFFFF FFFFFFFF"""
+
 # Convert from the value supplied in the RFC to an integer
 prime = read_hex(raw_prime)
 generator = 2
@@ -20,7 +21,6 @@ generator = 2
 def create_dh_key():
     private = random.randint(0, int(2**32))
     public = pow(generator, private, prime)
-    # print('Keys are: '+str(private)+', '+str(public))
     return (public, private)
 
 def calculate_dh_secret(their_public, my_private):
