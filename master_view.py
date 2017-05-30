@@ -1,14 +1,25 @@
 import os
 import Crypto.Hash.SHA256 as SHA256
 import Crypto.PublicKey.RSA as RSA
+import Crypto.Cipher.PKCS1_v1_5 as Cipher
+import Crypto.Random as Random
 
-def decrypt_valuables(f):
-    # TODO: For Part 2, you'll need to decrypt the contents of this file
-    # The existing scheme uploads in plaintext
-    # As such, we just convert it back to ASCII and print it out
-    decoded_text = str(f[256:], 'ascii')
-    print(decoded_text)
+def decrypt_valuables(ciphertext):
+    key = RSA.importKey(open('id_rsa','r').read())
+    # This is the one part I don't get, but it works
+    # sentinel = Random.new().read(???)
+    # Decrypt
+    plaintext = Cipher.new(key).decrypt(ciphertext, b'')
+    # Break into message and hash, digested hash is 32 bits
+    message = plaintext[:-32]
+    hash = plaintext[-32:]
+    if validate(message, hash):
+        print(message)
+    else:
+        print("Invalid")
 
+def validate(message, hash):
+    return SHA256.new(message).digest()==hash
 
 if __name__ == "__main__":
     fn = input("Which file in pastebot.net does the botnet master want to view? ")

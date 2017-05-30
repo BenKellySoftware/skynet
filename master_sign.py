@@ -15,9 +15,8 @@ def sign_file(file):
     return signature + file
 
 def sign(file, key):
-    signer = signer = Signer.new(key)
     hash = SHA256.new(file)
-    return signer.sign(hash) 
+    return Signer.new(key).sign(hash) 
 
 
 if __name__ == "__main__":
