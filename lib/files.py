@@ -1,5 +1,7 @@
 import os
 import Crypto.PublicKey.RSA as RSA
+import Crypto.Hash.SHA256 as SHA256
+import Crypto.Signature.PKCS1_v1_5 as Signer
 
 # Instead of storing files on disk,
 # we'll save them in memory for simplicity
@@ -35,12 +37,17 @@ def verify_file(f):
     # Verify the file was sent by the bot master
     # TODO: For Part 2, you'll use public key crypto here
     # Naive verification by ensuring the first line has the "passkey"
-    pubkey = RSA.importKey(open('id_rsa','r').read())
-    lines = f.split(bytes("\n", "ascii"), 1)
-    first_line = lines[0]
-    print(int(first_line))
-    print(lines[1])
-    return pubkey.verify(lines[1],(int(first_line),""))
+    pubkey = RSA.importKey(open('id_rsa.pub','r').read())
+    hash = SHA256.new(f[256:])
+    signer = Signer.new(pubkey)
+    
+    
+    # lines = f.split(bytes("\n", "ascii"), 1)
+    # first_line = lines[0]
+    # RSA Verification, Deprecated
+    # return pubkey.verify(lines[1],(int(first_line),""))
+
+    return signer.verify(hash, f[:256])
 
 def process_file(fn, f):
     if verify_file(f):

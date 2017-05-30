@@ -1,15 +1,23 @@
 import os
 import Crypto.PublicKey.RSA as RSA
-from Crypto.Random import random
+import Crypto.Hash.SHA256 as SHA256
+import Crypto.Signature.PKCS1_v1_5 as Signer
+
 
 def sign_file(file):
     # Load RSA Key
     key = RSA.importKey(open('id_rsa','r').read())
-    
+    signature = sign(file, key)
+    #RSA Signature mode, Deprecated
     # The sign outputs a tuple that has no second value for some weird reason
-    signature = key.sign(file, "")[0]
+    # signature = key.sign(file, "")[0]
 
-    return bytes(str(signature)+"\n", "ascii") + file
+    return signature + file
+
+def sign(file, key):
+    signer = signer = Signer.new(key)
+    hash = SHA256.new(file)
+    return signer.sign(hash) 
 
 
 if __name__ == "__main__":

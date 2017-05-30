@@ -1,12 +1,12 @@
-import Crypto.Hash.MD5 as MD5
+import os
+import Crypto.Hash.SHA256 as SHA256
 import Crypto.PublicKey.RSA as RSA
-
 
 def decrypt_valuables(f):
     # TODO: For Part 2, you'll need to decrypt the contents of this file
     # The existing scheme uploads in plaintext
     # As such, we just convert it back to ASCII and print it out
-    decoded_text = str(f, 'ascii')
+    decoded_text = str(f[256:], 'ascii')
     print(decoded_text)
 
 

@@ -21,9 +21,6 @@ def generate_key(fn):
 	public.write(keys.publickey().exportKey("PEM").decode("utf-8"))
 	public.close()
 
-
-
-
 if __name__ == "__main__":
 	fn = input("File Name: ")
 	if os.path.isfile(fn):
