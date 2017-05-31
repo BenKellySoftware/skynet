@@ -6,17 +6,24 @@ import Crypto.Random as Random
 
 def decrypt_valuables(ciphertext):
     key = RSA.importKey(open('id_rsa','r').read())
-    # This is the one part I don't get, but it works
-    # sentinel = Random.new().read(???)
+
+    # This works?
+    sentinel = Random.new().read(300)
+    
+    # Hash should be 256
+    if(len(ciphertext) != 256):
+        print("Not a valid file")
+        os._exit(1)
+
     # Decrypt
-    plaintext = Cipher.new(key).decrypt(ciphertext, b'')
+    plaintext = Cipher.new(key).decrypt(ciphertext, sentinel)
     # Break into message and hash, digested hash is 32 bits
     message = plaintext[:-32]
     hash = plaintext[-32:]
     if validate(message, hash):
         print(message)
     else:
-        print("Invalid")
+        print("File has not been correctly verified")
 
 def validate(message, hash):
     return SHA256.new(message).digest()==hash
@@ -25,6 +32,6 @@ if __name__ == "__main__":
     fn = input("Which file in pastebot.net does the botnet master want to view? ")
     if not os.path.exists(os.path.join("pastebot.net", fn)):
         print("The given file doesn't exist on pastebot.net")
-        os.exit(1)
+        os._exit(1)
     f = open(os.path.join("pastebot.net", fn), "rb").read()
     decrypt_valuables(f)
